@@ -1,5 +1,4 @@
 use crate::Bind;
-use egui::epaint::StrokeKind;
 use egui::{
     pos2, vec2, Event, Id, Key, KeyboardShortcut, ModifierNames, PointerButton, RichText, Sense,
     TextStyle, Ui, Widget, WidgetInfo, WidgetText, WidgetType,
@@ -103,13 +102,13 @@ fn set_expecting(ui: &Ui, id: Id, expecting: bool) {
     });
 }
 
-impl<B: Bind> Widget for Keybind<'_, B> {
+impl<'a, B: Bind> Widget for Keybind<'a, B> {
     fn ui(self, ui: &mut egui::Ui) -> egui::Response {
         let text = self.bind.format(self.modifier_names, false);
 
         let galley = WidgetText::RichText(RichText::new(text.clone())).into_galley(
             ui,
-            Some(egui::TextWrapMode::Extend),
+            Some(false),
             0.0,
             TextStyle::Button,
         );
@@ -123,7 +122,7 @@ impl<B: Bind> Widget for Keybind<'_, B> {
         let text_galley = if !self.text.is_empty() {
             let galley = WidgetText::RichText(RichText::new(self.text)).into_galley(
                 ui,
-                None,
+                Some(true),
                 ui.available_width() - widget_size.x, // not exactly right
                 TextStyle::Button,
             );
@@ -155,7 +154,6 @@ impl<B: Bind> Widget for Keybind<'_, B> {
         response.widget_info(|| {
             WidgetInfo::selected(
                 WidgetType::Button,
-                expecting,
                 expecting,
                 if self.text.is_empty() {
                     text.clone() // just read out the hotkey
@@ -225,10 +223,9 @@ impl<B: Bind> Widget for Keybind<'_, B> {
             let visuals = ui.style().interact_selectable(&response, expecting);
             ui.painter().rect(
                 hotkey_rect.expand(visuals.expansion),
-                visuals.corner_radius,
+                visuals.rounding,
                 visuals.bg_fill,
                 visuals.bg_stroke,
-                StrokeKind::Inside,
             );
 
             // align text to center in rect that is shrinked to match button padding

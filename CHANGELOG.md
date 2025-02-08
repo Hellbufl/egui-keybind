@@ -1,7 +1,3 @@
-# 0.6.0
-
-* #13: Update to egui 0.31.0 (thanks @Unpredictability)
-
 # 0.3.0
 
 * Update to egui 0.27
